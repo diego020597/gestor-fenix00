@@ -32,15 +32,14 @@ import type { TeamStorageItem } from '../gestor-fenix/page';
 
 import { volleyballCategories } from "@/constants/volleyballCategories";
 
-export default function AtletasPage() {
+import { volleyballCategories } from "./constants";
+
+export default function Page() {
   return (
     <div>
-      <h1>Categorías</h1>
-      <ul>
-        {volleyballCategories.map((cat) => (
-          <li key={cat}>{cat}</li>
-        ))}
-      </ul>
+      {volleyballCategories.map((cat) => (
+        <p key={cat}>{cat}</p>
+      ))}
     </div>
   );
 }
