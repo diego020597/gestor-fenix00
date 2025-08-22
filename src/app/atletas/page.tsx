@@ -30,17 +30,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { TeamStorageItem } from '../gestor-fenix/page';
 
 
-const volleyballCategories = [
-  "Mini Voley (Sub-8) (2017-adelante)",
-  "Benjamín (Sub-10) (2015-2016)",
-  "Alevín (Sub-12) (2013-2014)",
-  "Infantil (Sub-14) (2011-2012)",
-  "Cadete (Sub-16) (2009-2010)",
-  "Juvenil (Sub-18) (2007-2008)",
-  "Junior (Sub-21) (2004-2006)",
-  "Senior/Absoluta",
-  "Por definir",
-];
+import { volleyballCategories } from "@/constants/volleyballCategories";
+
+export default function AtletasPage() {
+  return (
+    <div>
+      <h1>Categorías</h1>
+      <ul>
+        {volleyballCategories.map((cat) => (
+          <li key={cat}>{cat}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 const genderOptionsForFilter = ['Todos', 'Masculino', 'Femenino', 'Otro', 'Prefiero no decirlo'];
 const statusOptionsForFilter = [
   { value: 'all', label: 'Todos los estados' },
