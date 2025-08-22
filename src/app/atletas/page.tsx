@@ -30,7 +30,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { TeamStorageItem } from '../gestor-fenix/page';
 
 
-export const volleyballCategories = [
+const volleyballCategories = [
   "Mini Voley (Sub-8) (2017-adelante)",
   "Benjamín (Sub-10) (2015-2016)",
   "Alevín (Sub-12) (2013-2014)",
