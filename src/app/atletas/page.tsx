@@ -1,4 +1,3 @@
-
 'use client';
 
 import AppLayout from '@/components/layout/AppLayout';
@@ -9,14 +8,14 @@ import Link from 'next/link';
 import { UserPlus, Trash2, Filter, Edit, LayoutGrid, List, Power, PowerOff, Eye } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
@@ -29,119 +28,107 @@ import type { AthleteStorageItem } from '../registro/atleta/page';
 import { useAuth } from '@/contexts/AuthContext';
 import type { TeamStorageItem } from '../gestor-fenix/page';
 
-
 import { volleyballCategories } from "@/constants/volleyballCategories";
 
-import { volleyballCategories } from "./constants";
-
-export default function Page() {
-  return (
-    <div>
-      {volleyballCategories.map((cat) => (
-        <p key={cat}>{cat}</p>
-      ))}
-    </div>
-  );
-}
 const genderOptionsForFilter = ['Todos', 'Masculino', 'Femenino', 'Otro', 'Prefiero no decirlo'];
 const statusOptionsForFilter = [
-  { value: 'all', label: 'Todos los estados' },
-  { value: 'active', label: 'Solo Activos' },
-  { value: 'inactive', label: 'Solo Inactivos' },
+    { value: 'all', label: 'Todos los estados' },
+    { value: 'active', label: 'Solo Activos' },
+    { value: 'inactive', label: 'Solo Inactivos' },
 ];
 
 const ATHLETES_STORAGE_KEY = 'athletes';
 const GESTOR_FENIX_TEAMS_STORAGE_KEY = 'gestorFenix_teams_v1';
 
-
 export default function AthleteProfilesPage() {
-  const [athletes, setAthletes] = useState<AthleteStorageItem[]>([]);
-  const [athleteToDelete, setAthleteToDelete] = useState<AthleteStorageItem | null>(null);
-  const { toast } = useToast();
-  const [mounted, setMounted] = useState(false);
-  const { user, isLoading: authIsLoading } = useAuth();
+    const [athletes, setAthletes] = useState<AthleteStorageItem[]>([]);
+    const [athleteToDelete, setAthleteToDelete] = useState<AthleteStorageItem | null>(null);
+    const { toast } = useToast();
+    const [mounted, setMounted] = useState(false);
+    const { user, isLoading: authIsLoading } = useAuth();
 
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterGender, setFilterGender] = useState<string>('Todos');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [canCoachRegister, setCanCoachRegister] = useState(false);
+    const [filterCategory, setFilterCategory] = useState<string>('all');
+    const [filterGender, setFilterGender] = useState<string>('Todos');
+    const [filterStatus, setFilterStatus] = useState<string>('all');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [canCoachRegister, setCanCoachRegister] = useState(false);
 
-  const [isAthleteLimitReached, setIsAthleteLimitReached] = useState(false);
-  const [athleteLimit, setAthleteLimit] = useState<number | null>(null);
+    const [isAthleteLimitReached, setIsAthleteLimitReached] = useState(false);
+    const [athleteLimit, setAthleteLimit] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (authIsLoading) return; 
-    setMounted(true);
+    useEffect(() => {
+        if (authIsLoading) return;
+        setMounted(true);
 
-    if (user?.type === 'coach') {
-        setCanCoachRegister(!!(user.assignedCategories && user.assignedCategories.length > 0));
-    } else if (user?.type === 'admin' || user?.type === 'team_admin') {
-        setCanCoachRegister(true);
-    } else {
-        setCanCoachRegister(false);
-    }
-
-    try {
-      const storedAthletesString = localStorage.getItem(ATHLETES_STORAGE_KEY);
-      let athletesToDisplay: AthleteStorageItem[] = [];
-
-      if (storedAthletesString) {
-        const allStoredAthletes: AthleteStorageItem[] = JSON.parse(storedAthletesString);
-        
-        if (user?.type === 'team_admin' && user.teamId) {
-          athletesToDisplay = allStoredAthletes.filter(athlete => athlete.teamId === user.teamId);
-          // Check athlete limit for team_admin
-          try {
-            const teamsString = localStorage.getItem(GESTOR_FENIX_TEAMS_STORAGE_KEY);
-            if (teamsString) {
-              const allTeams: TeamStorageItem[] = JSON.parse(teamsString);
-              const currentTeam = allTeams.find(t => t.id === user.teamId);
-              if (currentTeam?.athleteLimit) {
-                const limit = parseInt(currentTeam.athleteLimit, 10);
-                if (!isNaN(limit)) {
-                  setAthleteLimit(limit);
-                  setIsAthleteLimitReached(athletesToDisplay.length >= limit);
-                } else {
-                  setIsAthleteLimitReached(false); // "más de X" means no limit
-                }
-              }
-            }
-          } catch(e) { console.error("Failed to check athlete limit", e) }
-
-        } else if (user?.type === 'coach' && user.assignedCategories && user.assignedCategories.length > 0) {
-          athletesToDisplay = allStoredAthletes.filter(athlete => 
-            !athlete.teamId && user.assignedCategories!.includes(athlete.category)
-          );
-        } else if (user?.type === 'admin') { 
-          athletesToDisplay = allStoredAthletes.filter(athlete => !athlete.teamId); // Admin global ve solo los sin teamId
-        } else { 
-             athletesToDisplay = [];
+        if (user?.type === 'coach') {
+            setCanCoachRegister(!!(user.assignedCategories && user.assignedCategories.length > 0));
+        } else if (user?.type === 'admin' || user?.type === 'team_admin') {
+            setCanCoachRegister(true);
+        } else {
+            setCanCoachRegister(false);
         }
 
-        const adaptedAthletes = athletesToDisplay.map(sa => ({
-            ...sa,
-            name: sa.name || `${sa.firstName} ${sa.lastName}`,
-            category: sa.category || 'Por definir',
-            gender: sa.gender || 'Prefiero no decirlo',
-            dataAiHint: sa.dataAiHint || (sa.gender === 'Masculino' ? 'male athlete' : sa.gender === 'Femenino' ? 'female athlete' : 'athlete person'),
-            weight: sa.weight || '',
-            height: sa.height || '',
-            imc: sa.imc === undefined ? null : sa.imc,
-            imcStatus: sa.imcStatus || 'No calculado',
-            termsAccepted: sa.termsAccepted !== undefined ? sa.termsAccepted : false,
-            isActive: sa.isActive === undefined ? true : sa.isActive,
-            statusReason: sa.statusReason || '',
-          }));
-        setAthletes(adaptedAthletes);
-      } else {
-        setAthletes([]);
-      }
-    } catch (error) {
-      console.error("Error loading athletes from localStorage:", error);
-      setAthletes([]);
-    }
-  }, [user, authIsLoading, toast]);
+        try {
+            const storedAthletesString = localStorage.getItem(ATHLETES_STORAGE_KEY);
+            let athletesToDisplay: AthleteStorageItem[] = [];
+
+            if (storedAthletesString) {
+                const allStoredAthletes: AthleteStorageItem[] = JSON.parse(storedAthletesString);
+
+                if (user?.type === 'team_admin' && user.teamId) {
+                    athletesToDisplay = allStoredAthletes.filter(athlete => athlete.teamId === user.teamId);
+                    try {
+                        const teamsString = localStorage.getItem(GESTOR_FENIX_TEAMS_STORAGE_KEY);
+                        if (teamsString) {
+                            const allTeams: TeamStorageItem[] = JSON.parse(teamsString);
+                            const currentTeam = allTeams.find(t => t.id === user.teamId);
+                            if (currentTeam?.athleteLimit) {
+                                const limit = parseInt(currentTeam.athleteLimit, 10);
+                                if (!isNaN(limit)) {
+                                    setAthleteLimit(limit);
+                                    setIsAthleteLimitReached(athletesToDisplay.length >= limit);
+                                } else {
+                                    setIsAthleteLimitReached(false);
+                                }
+                            }
+                        }
+                    } catch (e) { console.error("Failed to check athlete limit", e) }
+
+                } else if (user?.type === 'coach' && user.assignedCategories && user.assignedCategories.length > 0) {
+                    athletesToDisplay = allStoredAthletes.filter(athlete =>
+                        !athlete.teamId && user.assignedCategories!.includes(athlete.category)
+                    );
+                } else if (user?.type === 'admin') {
+                    athletesToDisplay = allStoredAthletes.filter(athlete => !athlete.teamId);
+                } else {
+                    athletesToDisplay = [];
+                }
+
+                const adaptedAthletes = athletesToDisplay.map(sa => ({
+                    ...sa,
+                    name: sa.name || `${sa.firstName} ${sa.lastName}`,
+                    category: sa.category || 'Por definir',
+                    gender: sa.gender || 'Prefiero no decirlo',
+                    dataAiHint: sa.dataAiHint || (sa.gender === 'Masculino' ? 'male athlete' : sa.gender === 'Femenino' ? 'female athlete' : 'athlete person'),
+                    weight: sa.weight || '',
+                    height: sa.height || '',
+                    imc: sa.imc === undefined ? null : sa.imc,
+                    imcStatus: sa.imcStatus || 'No calculado',
+                    termsAccepted: sa.termsAccepted !== undefined ? sa.termsAccepted : false,
+                    isActive: sa.isActive === undefined ? true : sa.isActive,
+                    statusReason: sa.statusReason || '',
+                }));
+                setAthletes(adaptedAthletes);
+            } else {
+                setAthletes([]);
+            }
+        } catch (error) {
+            console.error("Error loading athletes from localStorage:", error);
+            setAthletes([]);
+        }
+    }, [user, authIsLoading, toast]);
+}
+
 
   const handleToggleAthleteStatus = (athleteId: string, newIsActive: boolean) => {
     setAthletes(prevAthletes => {
